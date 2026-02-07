@@ -5,7 +5,13 @@ init-env:
 
 up:
 	$(MAKE) init-env
+	$(COMPOSE) --profile dev up -d --build
+
+rebuild:
+	$(MAKE) init-env
+	$(COMPOSE) --profile dev build --no-cache
 	$(COMPOSE) --profile dev up -d
+
 
 down:
 	$(COMPOSE) down

@@ -64,5 +64,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy.sarif
+          category: trivy
         if: github.event_name == 'push'
-        category: trivy
+        

@@ -1,18 +1,23 @@
-FROM python:3.12-slim
+# syntax=docker/dockerfile:1.7
 
-# 1) Crear usuario no-root (mejor práctica de seguridad)
-RUN useradd -m -u 10001 appuser
+FROM python:3.12-slim AS builder
+WORKDIR /build
 
+COPY requirements.txt .
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --prefix=/install --no-cache-dir -r requirements.txt
+
+
+FROM python:3.12-slim AS runtime
 WORKDIR /app
 
-# 2) Instalar dependencias (cache-friendly)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN useradd -m -u 10001 appuser
 
-# 3) Copiar código y ajustar permisos
+COPY --from=builder /install /usr/local
 COPY app ./app
-RUN chown -R appuser:appuser /app
 
+RUN chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000
